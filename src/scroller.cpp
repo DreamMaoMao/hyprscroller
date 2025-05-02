@@ -1128,6 +1128,8 @@ public:
         // for gaps outer
         static auto* const PGAPSIN = &g_pConfigManager->getConfigValuePtr("general:gaps_in")->intValue;
         static auto* const PGAPSOUT = &g_pConfigManager->getConfigValuePtr("general:gaps_out")->intValue;
+    	static auto *const STRUCTS_VERTICAL = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:scroller:structs_vertical")->intValue;
+    	static auto *const STRUCTS_HORIZONTAL = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:scroller:structs_horizontal")->intValue;
 
         const auto SIZE = monitor->vecSize;
         const auto POS = monitor->vecPosition;
@@ -1135,10 +1137,10 @@ public:
         const auto BOTTOMRIGHT = monitor->vecReservedBottomRight;
 
         full = Box(POS, SIZE);
-        max = Box(POS.x + TOPLEFT.x + *PGAPSOUT,
-                POS.y + TOPLEFT.y + *PGAPSOUT,
-                SIZE.x - TOPLEFT.x - BOTTOMRIGHT.x - 2 * *PGAPSOUT,
-                SIZE.y - TOPLEFT.y - BOTTOMRIGHT.y - 2 * *PGAPSOUT);
+        max = Box(POS.x + TOPLEFT.x + *PGAPSOUT + *STRUCTS_HORIZONTAL,
+                POS.y + TOPLEFT.y + *PGAPSOUT + *STRUCTS_VERTICAL,
+                SIZE.x - TOPLEFT.x - BOTTOMRIGHT.x - 2 * *PGAPSOUT - 2* *STRUCTS_HORIZONTAL,
+                SIZE.y - TOPLEFT.y - BOTTOMRIGHT.y - 2 * *PGAPSOUT - 2* *STRUCTS_VERTICAL);
         gap = *PGAPSIN;
     }
     void set_fullscreen_active_window() {
