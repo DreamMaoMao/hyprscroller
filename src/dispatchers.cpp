@@ -43,8 +43,7 @@ namespace {
         } else {
             workspace_id = g_pCompositor->m_pLastMonitor->activeWorkspace;
         }
-        if (workspace_id == WORKSPACE_INVALID)
-            return -1;
+
         auto *workspace = g_pCompositor->getWorkspaceByID(workspace_id);
         if (workspace == nullptr)
             return -1;

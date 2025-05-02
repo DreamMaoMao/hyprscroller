@@ -564,7 +564,9 @@ public:
     }
 #endif
     void update_width(ColumnWidth cwidth, double maxw, double maxh) {
-        if (maximized()) {
+        if (m_bSingleColumn) {  // 如果是单列模式，强制铺满
+            geom.w = maxw;
+        } else if (maximized()) {
             geom.w = maxw;
         } else {
             switch (cwidth) {
@@ -750,11 +752,12 @@ public:
             }
         }
     }
-
+    void setSingleColumn(bool single) { m_bSingleColumn = single; }
 private:
     struct Memory {
         Box geom;
     };
+    bool m_bSingleColumn = false;  // 新增标志位
     ColumnWidth width;
     WindowHeight height;
     Reorder reorder;
@@ -802,6 +805,16 @@ public:
         }
         active = columns.emplace_after(active, new Column(window, max.w, max.h));
         reorder = Reorder::Auto;
+
+        // 更新单列状态
+        if (columns.size() == 1) {
+            active->data()->setSingleColumn(true);
+            columns.first()->data()->update_width(ColumnWidth::Free, max.w, max.h);
+        } else if (columns.size() != 1) {
+            columns.first()->data()->setSingleColumn(false);
+            columns.first()->data()->update_width(ColumnWidth::OneHalf, max.w, max.h);
+        }
+
         recalculate_row_geometry();
     }
 
@@ -824,6 +837,13 @@ public:
                     }
                     delete col;
                     columns.erase(c);
+
+                    // 更新单列状态
+                    if (columns.size() == 1) {
+                        columns.first()->data()->setSingleColumn(true);
+                        columns.first()->data()->update_width(ColumnWidth::Free, max.w, max.h);
+                    }
+
                     if (columns.empty()) {
                         return false;
                     } else {
@@ -1808,8 +1828,6 @@ static int get_workspace_id() {
     } else {
         workspace_id = g_pCompositor->m_pLastMonitor->activeWorkspace;
     }
-    if (workspace_id == WORKSPACE_INVALID)
-        return -1;
     if (g_pCompositor->getWorkspaceByID(workspace_id) == nullptr)
         return -1;
 
