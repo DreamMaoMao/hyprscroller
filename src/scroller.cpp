@@ -1262,6 +1262,10 @@ public:
             double w = bmax.x - bmin.x;
             double h = bmax.y - bmin.y;
             double scale = std::min(max.w / w, max.h / h);
+            if(scale >= 1) {
+                overview = !overview;
+                return;
+            }
             for (auto c = columns.first(); c != nullptr; c = c->next()) {
                 Column *col = c->data();
                 col->push_geom();
